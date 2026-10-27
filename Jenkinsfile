@@ -36,13 +36,22 @@ pipeline {
             }
         }
 
-        stage('Verify Deployment') {
-            steps {
-                bat '''
-                powershell -NoProfile -Command "$r = Invoke-WebRequest -Uri 'http://localhost:5000/health' -TimeoutSec 15; if ($r.StatusCode -ne 200) { exit 1 }; Write-Output $r.Content"
-                '''
-            }
-        }
+        
+stage('Verify Deployment') {
+    steps {
+        bat '''
+        @echo off
+        for /L %%i in (1,1,10) do (
+            curl.exe --fail --silent --show-error http://127.0.0.1:5000/health
+            if not errorlevel 1 exit /b 0
+            timeout /t 2 /nobreak >nul
+        )
+        echo Health check failed after 10 attempts.
+        exit /b 1
+        '''
+    }
+}
+
     }
 
     post {
