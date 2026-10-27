@@ -20,6 +20,11 @@ pipeline {
                 bat 'python -m compileall -q app.py'
             }
         }
+        stage('Train ML Model') {
+            steps {
+                bat 'python train_model.py'
+            }
+        }
 
         stage('Build Docker Image') {
             steps {
